@@ -2,7 +2,11 @@
 
 Converts a `.csv` file row-wise to `.npz` training samples and exports it into a directory.
 
-## Run Script
+## Run Graphical User Interface (GUI)
+
+To start the GUI just open a terminal window and type `python3 runGui.py`
+
+## Run Script in Terminal
 
 To run the script just type:
 `python3 runConvert.py`
@@ -29,6 +33,11 @@ No. | x | y | perm_tank | perm_obj | r | ex1_pot1 | ex1_pot2 | ... | ex1_pot{n_e
 - - The radius is randomly selected in $r \in [0.1,1]$
 - - The permittivity is komplex and also randomly choosen. The conductivities are consistent within the object area and the blank area.
 - - The number of evaluated electrodes {n_el} is 16
+
+## Future Work
+
+- Make the input csv robust against variations in the header position.
+
 
 ## Contact
 

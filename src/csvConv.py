@@ -1,22 +1,22 @@
 # Impts
-import csv
+
 import os
 
 import numpy as np
-import pandas as pd
+
 from pyeit.eit.fem import PyEITMesh
 from pyeit.mesh import distmesh, shape, wrapper
-from tqdm import tqdm
+
 
 try:
     import matplotlib.pyplot as plt
-except:
+except BaseException:
     print(
         "To use the visualization functions:\n -plot_mesh\n -plot_cmplx_pots\n you have to import:\n import matplotlib.pyplot as plt"
     )
 
-# Fcts
-def plot_mesh(mesh_obj: PyEITMesh):
+
+def plot_mesh(mesh_obj: PyEITMesh) -> None:
     """Plot PyEITMesh"""
     plt.style.use("default")
     pts = mesh_obj.node
@@ -45,7 +45,7 @@ def plot_mesh(mesh_obj: PyEITMesh):
     fig.set_size_inches(6, 6)
 
 
-def plot_cmplx_pots(complex_mat):
+def plot_cmplx_pots(complex_mat) -> None:
     plt.imshow(complex_mat.real)
     plt.colorbar()
     plt.show()
@@ -63,7 +63,7 @@ def init_save_dir() -> str:
         savepath = sdir + "/"
         print("Samples will be svaed to:", savepath)
         return savepath
-    except:
+    except BaseException:
         print("already exist")
         init_save_dir()
 
@@ -88,7 +88,7 @@ def init_csv_source() -> str:
         return csv_filename
 
 
-def julia_python_complex_convert(z: complex) -> "tupel":
+def julia_python_complex_convert(z: complex):
     """
     input: z = a + jb from julia: ['0.1 + 0.0im']
     returns: real, imag
@@ -97,7 +97,7 @@ def julia_python_complex_convert(z: complex) -> "tupel":
 
 
 def generate_groundtruth(
-    dataframe: "Pandas Dataframe",
+    dataframe,
     N: int,
     el_pos: np.ndarray = np.arange(16),
     h0: float = 0.1,
@@ -154,9 +154,7 @@ def generate_groundtruth(
     return mesh_dataset, anomaly_props
 
 
-def extract_el_potentials(
-    dataframe: "Pandas Dataframe", N: int, delete_meas_electrodes: bool = False
-) -> "complex_mat":
+def extract_el_potentials(dataframe, N: int, delete_meas_electrodes: bool = False):
     """
     Computes the potentials of a single row N out of a pandas dataframe.
     """
