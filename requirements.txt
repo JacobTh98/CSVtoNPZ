@@ -1,4 +1,5 @@
+matplotlib==3.3.3
 numpy==1.22.3
-pandas==1.4.2
-pyeit==1.2.4
-tqdm==4.62.3
+pandas==1.2.4
+pyeit==1.2.2
+tqdm==4.60.0
