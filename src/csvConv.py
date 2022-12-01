@@ -16,7 +16,7 @@ except BaseException:
     )
 
 
-def plot_mesh(mesh_obj: PyEITMesh):
+def plot_mesh(mesh_obj: PyEITMesh) -> None:
     """Plot PyEITMesh"""
     plt.style.use("default")
     pts = mesh_obj.node
@@ -45,7 +45,7 @@ def plot_mesh(mesh_obj: PyEITMesh):
     fig.set_size_inches(6, 6)
 
 
-def plot_cmplx_pots(complex_mat):
+def plot_cmplx_pots(complex_mat) -> None:
     plt.imshow(complex_mat.real)
     plt.colorbar()
     plt.show()
