@@ -1,7 +1,7 @@
 # CSVtoNPZ
 
 Converts a `.csv` file row-wise to `.npz` training samples and exports it into a directory.
-___
+
 ## Run Script
 
 To run the script just type:
@@ -23,17 +23,12 @@ No. | x | y | perm_tank | perm_obj | r | ex1_pot1 | ex1_pot2 | ... | ex1_pot{n_e
 --- | --- | --- | --- |--- |--- |--- |--- |--- |--- |--- |--- |---
 
 - {n_el} is the number of electrodes that are used during the simulation
+- The ex_pot columns contain the voltage between the corresponding electrode numbers
 - The provided [csv-file](2022-11-30EIT_cyl-anom_opp-exc_discr0.2.csv) has the properties:
-- - The position is randomly selected in $$x,y \in [-1,1]$$
-- - The radius is randomly selected in $$r \in [0.1,1]$$
+- - The position is randomly selected in $x,y \in [-1,1]$
+- - The radius is randomly selected in $r \in [0.1,1]$
 - - The permittivity is komplex and also randomly choosen. The conductivities are consistent within the object area and the blank area.
-- - The number of evaluated electrodes potentials positions {n_el} is $$16$$
-- 
-## Future Tasks
-
-Implementing the extraction of the potential difference to receive the voltage between individual electrodes.
-
-___
+- - The number of evaluated electrodes {n_el} is 16
 
 ## Contact
 
