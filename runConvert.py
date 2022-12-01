@@ -1,3 +1,12 @@
+import csv
+import os
+
+import numpy as np
+import pandas as pd
+from pyeit.eit.fem import PyEITMesh
+from pyeit.mesh import distmesh, shape, wrapper
+from tqdm import tqdm
+
 from csvConv import *
 
 savepath = init_save_dir()
@@ -7,8 +16,9 @@ dataframe = pd.read_csv(csv_filename)
 
 for N in tqdm(range(len(dataframe))):
 
-    vmesh, anomaly = generate_groundtruth(dataframe,N)
+    mesh, anomaly = generate_groundtruth(dataframe,N)
     complex_mat = extract_el_potentials(dataframe,N, delete_meas_electrodes=False)
+    n_el = complex_mat.shape[0]
     pot_vec = np.reshape(complex_mat,(n_el**2))
     
     np.savez(savepath + 'sample_{0:06d}.npz'.format(N), 
