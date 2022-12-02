@@ -16,7 +16,7 @@ except BaseException:
     )
 
 
-def plot_mesh(mesh_obj: PyEITMesh) -> None:
+def plot_mesh(mesh_obj: PyEITMesh, savefig: bool = False) -> None:
     """Plot PyEITMesh"""
     plt.style.use("default")
     pts = mesh_obj.node
@@ -38,11 +38,14 @@ def plot_mesh(mesh_obj: PyEITMesh) -> None:
     ax.plot(x[mesh_obj.el_pos], y[mesh_obj.el_pos], "ro")
     for i, e in enumerate(mesh_obj.el_pos):
         ax.text(x[e], y[e], str(i + 1), size=12)
-    ax.set_title(r"mesh")
+    ax.set_title(r"PyEITMesh")
     ax.set_aspect("equal")
     ax.set_ylim([-1.2, 1.2])
     ax.set_xlim([-1.2, 1.2])
     fig.set_size_inches(6, 6)
+    if savefig:
+        plt.tight_layout()
+        plt.savefig("tmp_mesh.jpg")
 
 
 def plot_cmplx_pots(complex_mat) -> None:
