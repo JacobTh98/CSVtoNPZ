@@ -12,8 +12,10 @@ from tkinter import (
     Menu,
     messagebox,
     filedialog,
+    Toplevel,
     ttk,
 )
+
 from src.csvConv import (
     generate_groundtruth,
     extract_el_potentials,
@@ -95,7 +97,7 @@ class SelectingArea:
         self.MeshPreview = Button(
             app,
             text="Preview",
-            command=self.preview_mesh,
+            command=self.mesh_preview,
             font=("Arial 15"),
             background="#D7A151",
             activebackground="#FEF2B8",
@@ -122,9 +124,11 @@ class SelectingArea:
         )
         self.PrograssBar.place(x=300, y=250, width=450, height=40)
 
-    def preview_mesh(self):
-        print("to do")
-        pass
+    def mesh_preview(self):
+        previewWindow = Toplevel(app)
+        previewWindow.title("Mesh Preview")
+        previewWindow.geometry("400x400")
+        Label(previewWindow, text="Future task").pack()
 
     def set_mesh_ref(self):
         global h0
