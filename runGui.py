@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+from PIL import Image, ImageTk
 from tkinter import (
     TOP,
     HORIZONTAL,
@@ -21,6 +22,7 @@ from src.csvConv import (
     extract_el_potentials,
     re_im_re_im,
     re_re_im_im,
+    plot_mesh,
 )
 
 
@@ -125,17 +127,41 @@ class SelectingArea:
         self.PrograssBar.place(x=300, y=250, width=450, height=40)
 
     def mesh_preview(self):
+
         previewWindow = Toplevel(app)
         previewWindow.title("Mesh Preview")
-        previewWindow.geometry("400x400")
-        Label(previewWindow, text="Future task").pack()
+        previewWindow.geometry("600x600")
+
+        image = Image.open("tmp_mesh.jpg")
+        display = ImageTk.PhotoImage(image)
+        label = Label(previewWindow, image=display)
+        label.image = display
+        label.pack()
 
     def set_mesh_ref(self):
         global h0
         h0 = float(self.h0Entry.get())
-        self.StartConv["state"] = "normal"
-        if h0 != "":
+
+        def gen_mesh():
+            dataframe = pd.read_csv(loadpath)
+            mesh, _ = generate_groundtruth(dataframe, 0, h0=h0)
+            plot_mesh(mesh, savefig=True)
             self.MeshPreview["state"] = "normal"
+            self.StartConv["state"] = "normal"
+
+        if float(h0) <= 0.01:
+            result = messagebox.askquestion(
+                "Are you sure you want to continue?",
+                "The Meshing refinement is very high.",
+                icon="warning",
+            )
+            if result == "yes":
+                gen_mesh()
+            else:
+                pass
+
+        if h0 != "" and float(h0) > 0.01:
+            gen_mesh()
 
     def openfile(self):
         global loadpath
@@ -158,6 +184,10 @@ class SelectingArea:
         self.SetMeshRef["state"] = "normal"
 
     def start_conv(self):
+        try:
+            os.remove("tmp_mesh.jpg")
+        except BaseException:
+            print("PyEITMesh preview file already deleted")
         print(loadpath)
 
         dataframe = pd.read_csv(loadpath)
@@ -194,6 +224,9 @@ class SelectingArea:
         self.PrograssBar.update_idletasks()
         self.SelectEntry["text"] = "Selected file name"
         self.StartConv["state"] = "disabled"
+        self.MeshPreview["state"] = "disabled"
+        self.SetMeshRef["state"] = "disabled"
+        self.h0Entry.delete(0,END)
         finish_dialog()
 
 
@@ -223,7 +256,6 @@ app = Tk()
 app.title("CSVtoNPZ ©JaTh")
 app.configure(background="#3C5B66")
 
-### top bar
 dropdown = Menu(app)
 datei_menu = Menu(dropdown, tearoff=0)
 datei_menu.add_command(label="Exit", command=app.quit)
@@ -234,7 +266,6 @@ help_menu.add_command(label="Info", command=action_get_info_dialog)
 dropdown.add_cascade(label="Options", menu=datei_menu)
 dropdown.add_cascade(label="Help", menu=help_menu)
 
-###
 tf = Title(app)
 sa = SelectingArea(app)
 
