@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+from PIL import Image, ImageTk
 from tkinter import (
     TOP,
     HORIZONTAL,
@@ -12,13 +13,16 @@ from tkinter import (
     Menu,
     messagebox,
     filedialog,
+    Toplevel,
     ttk,
 )
+
 from src.csvConv import (
     generate_groundtruth,
     extract_el_potentials,
     re_im_re_im,
     re_re_im_im,
+    plot_mesh,
 )
 
 
@@ -75,6 +79,37 @@ class SelectingArea:
         self.ThirdStep = Label(app, text="3.", font=("Arial 15"), background="#FEF2B8")
         self.ThirdStep.place(x=20, y=190, width=40, height=40)
 
+        self.MeshRef = Label(
+            app, text="Mesh refinement", font=("Arial 15"), background="#FEF2B8"
+        )
+        self.MeshRef.place(x=80, y=190, width=200, height=40)
+        self.h0Entry = Entry(app, font=("Arial 15"))
+        self.h0Entry.place(x=300, y=190, width=90, height=40)
+
+        self.SetMeshRef = Button(
+            app,
+            text="Set",
+            command=self.set_mesh_ref,
+            font=("Arial 15"),
+            background="#D7A151",
+            activebackground="#FEF2B8",
+            state="disabled",
+        )
+        self.SetMeshRef.place(x=410, y=190, width=90, height=40)
+        self.MeshPreview = Button(
+            app,
+            text="Preview",
+            command=self.mesh_preview,
+            font=("Arial 15"),
+            background="#D7A151",
+            activebackground="#FEF2B8",
+            state="disabled",
+        )
+        self.MeshPreview.place(x=520, y=190, width=90, height=40)
+
+        self.ThirdStep = Label(app, text="4.", font=("Arial 15"), background="#FEF2B8")
+        self.ThirdStep.place(x=20, y=250, width=40, height=40)
+
         self.StartConv = Button(
             app,
             text="Convert",
@@ -84,12 +119,49 @@ class SelectingArea:
             activebackground="#FEF2B8",
             state="disabled",
         )
-        self.StartConv.place(x=80, y=190, width=200, height=40)
+        self.StartConv.place(x=80, y=250, width=200, height=40)
 
         self.PrograssBar = ttk.Progressbar(
             app, orient=HORIZONTAL, length=300, mode="determinate"
         )
-        self.PrograssBar.place(x=300, y=190, width=450, height=40)
+        self.PrograssBar.place(x=300, y=250, width=450, height=40)
+
+    def mesh_preview(self):
+
+        previewWindow = Toplevel(app)
+        previewWindow.title("Mesh Preview")
+        previewWindow.geometry("600x600")
+
+        image = Image.open("tmp_mesh.jpg")
+        display = ImageTk.PhotoImage(image)
+        label = Label(previewWindow, image=display)
+        label.image = display
+        label.pack()
+
+    def set_mesh_ref(self):
+        global h0
+        h0 = float(self.h0Entry.get())
+
+        def gen_mesh():
+            dataframe = pd.read_csv(loadpath)
+            mesh, _ = generate_groundtruth(dataframe, 0, h0=h0)
+            plot_mesh(mesh, savefig=True)
+            self.MeshPreview["state"] = "normal"
+            self.StartConv["state"] = "normal"
+
+        if float(h0) <= 0.01:
+            result = messagebox.askquestion(
+                "Are you sure you want to continue?",
+                "The Meshing refinement is very high.",
+                icon="warning",
+            )
+            if result == "yes":
+                gen_mesh()
+            else:
+                pass
+
+        if h0 != "" and float(h0) > 0.01:
+            gen_mesh()
 
     def openfile(self):
         global loadpath
@@ -108,9 +180,14 @@ class SelectingArea:
         os.mkdir(self.SaveFolderName.get())
         savepath = str(self.SaveFolderName.get()) + "/"
         print("savepath:", savepath)
-        self.StartConv["state"] = "normal"
+
+        self.SetMeshRef["state"] = "normal"
 
     def start_conv(self):
+        try:
+            os.remove("tmp_mesh.jpg")
+        except BaseException:
+            print("PyEITMesh preview file already deleted")
         print(loadpath)
 
         dataframe = pd.read_csv(loadpath)
@@ -118,7 +195,7 @@ class SelectingArea:
 
         for N in range(len(dataframe)):
 
-            mesh, anomaly = generate_groundtruth(dataframe, N)
+            mesh, anomaly = generate_groundtruth(dataframe, N, h0=h0)
             complex_mat = extract_el_potentials(
                 dataframe, N, delete_meas_electrodes=False
             )
@@ -147,6 +224,9 @@ class SelectingArea:
         self.PrograssBar.update_idletasks()
         self.SelectEntry["text"] = "Selected file name"
         self.StartConv["state"] = "disabled"
+        self.MeshPreview["state"] = "disabled"
+        self.SetMeshRef["state"] = "disabled"
+        self.h0Entry.delete(0, END)
         finish_dialog()
 
 
@@ -160,7 +240,7 @@ def action_get_info_dialog():
 \n\
 Autor: Jacob Thönes\n\
 Date: Oktober 2022\n\
-Version: 1.0\n\
+Version: 1.1\n\
 Contct: jacob.thoenes@uni-rostock.de \n\
 "
     messagebox.showinfo(message=m_text, title="Info")
@@ -176,7 +256,6 @@ app = Tk()
 app.title("CSVtoNPZ ©JaTh")
 app.configure(background="#3C5B66")
 
-### top bar
 dropdown = Menu(app)
 datei_menu = Menu(dropdown, tearoff=0)
 datei_menu.add_command(label="Exit", command=app.quit)
@@ -187,11 +266,10 @@ help_menu.add_command(label="Info", command=action_get_info_dialog)
 dropdown.add_cascade(label="Options", menu=datei_menu)
 dropdown.add_cascade(label="Help", menu=help_menu)
 
-###
 tf = Title(app)
 sa = SelectingArea(app)
 
 
 app.config(menu=dropdown)
-app.geometry("770x250")
+app.geometry("770x310")
 app.mainloop()
