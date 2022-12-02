@@ -203,7 +203,7 @@ def action_get_info_dialog():
 \n\
 Autor: Jacob Thönes\n\
 Date: Oktober 2022\n\
-Version: 1.0\n\
+Version: 1.1\n\
 Contct: jacob.thoenes@uni-rostock.de \n\
 "
     messagebox.showinfo(message=m_text, title="Info")
