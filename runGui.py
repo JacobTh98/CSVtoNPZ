@@ -226,7 +226,7 @@ class SelectingArea:
         self.StartConv["state"] = "disabled"
         self.MeshPreview["state"] = "disabled"
         self.SetMeshRef["state"] = "disabled"
-        self.h0Entry.delete(0,END)
+        self.h0Entry.delete(0, END)
         finish_dialog()
 
 
