@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 from PIL import Image, ImageTk
+from tqdm import tqdm
 from tkinter import (
     TOP,
     HORIZONTAL,
@@ -126,6 +127,30 @@ class SelectingArea:
         )
         self.PrograssBar.place(x=300, y=250, width=450, height=40)
 
+        self.FourthStep = Label(app, text="5.", font=("Arial 15"), background="#FEF2B8")
+        self.FourthStep.place(x=20, y=310, width=40, height=40)
+        self.TarGzButton = Button(
+            app,
+            text=".tar.gz",
+            command=self.tar_gz_and_delete,
+            font=("Arial 15"),
+            background="#D7A151",
+            state="disabled",
+            activebackground="#FEF2B8",
+        )
+        self.TarGzButton.place(x=80, y=310, width=200, height=40)
+
+    def tar_gz_and_delete(self):
+        cmd = (
+            "tar cfvz "
+            + str(self.SaveFolderName.get())
+            + ".tar.gz "
+            + str(self.SaveFolderName.get())
+        )
+        os.system(cmd)
+        cmd = "rm -r " + str(self.SaveFolderName.get())
+        os.system(cmd)
+
     def mesh_preview(self):
 
         previewWindow = Toplevel(app)
@@ -177,10 +202,13 @@ class SelectingArea:
 
     def generate_savefolder(self):
         global savepath
-        os.mkdir(self.SaveFolderName.get())
         savepath = str(self.SaveFolderName.get()) + "/"
+        try:
+            os.mkdir(self.SaveFolderName.get())
+        except BaseException:
+            print("folder already exists")
         print("savepath:", savepath)
-
+        self.TarGzButton["state"] = "normal"
         self.SetMeshRef["state"] = "normal"
 
     def start_conv(self):
@@ -191,9 +219,10 @@ class SelectingArea:
         print(loadpath)
 
         dataframe = pd.read_csv(loadpath)
-        progress_bar_step = 100 // len(dataframe)
+        print("length of dataframe:", len(dataframe))
+        progress_bar_step = 100 / len(dataframe)
 
-        for N in range(len(dataframe)):
+        for N in tqdm(range(len(dataframe))):
 
             mesh, anomaly = generate_groundtruth(dataframe, N, h0=h0)
             complex_mat = extract_el_potentials(
@@ -271,5 +300,5 @@ sa = SelectingArea(app)
 
 
 app.config(menu=dropdown)
-app.geometry("770x310")
+app.geometry("770x370")
 app.mainloop()
