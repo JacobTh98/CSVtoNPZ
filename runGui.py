@@ -75,6 +75,37 @@ class SelectingArea:
         self.ThirdStep = Label(app, text="3.", font=("Arial 15"), background="#FEF2B8")
         self.ThirdStep.place(x=20, y=190, width=40, height=40)
 
+        self.MeshRef = Label(
+            app, text="Mesh refinement", font=("Arial 15"), background="#FEF2B8"
+        )
+        self.MeshRef.place(x=80, y=190, width=200, height=40)
+        self.h0Entry = Entry(app, font=("Arial 15"))
+        self.h0Entry.place(x=300, y=190, width=90, height=40)
+
+        self.SetMeshRef = Button(
+            app,
+            text="Set",
+            command=self.set_mesh_ref,
+            font=("Arial 15"),
+            background="#D7A151",
+            activebackground="#FEF2B8",
+            state="disabled",
+        )
+        self.SetMeshRef.place(x=410, y=190, width=90, height=40)
+        self.MeshPreview = Button(
+            app,
+            text="Preview",
+            command=self.preview_mesh,
+            font=("Arial 15"),
+            background="#D7A151",
+            activebackground="#FEF2B8",
+            state="disabled",
+        )
+        self.MeshPreview.place(x=520, y=190, width=90, height=40)
+
+        self.ThirdStep = Label(app, text="4.", font=("Arial 15"), background="#FEF2B8")
+        self.ThirdStep.place(x=20, y=250, width=40, height=40)
+
         self.StartConv = Button(
             app,
             text="Convert",
@@ -84,12 +115,23 @@ class SelectingArea:
             activebackground="#FEF2B8",
             state="disabled",
         )
-        self.StartConv.place(x=80, y=190, width=200, height=40)
+        self.StartConv.place(x=80, y=250, width=200, height=40)
 
         self.PrograssBar = ttk.Progressbar(
             app, orient=HORIZONTAL, length=300, mode="determinate"
         )
-        self.PrograssBar.place(x=300, y=190, width=450, height=40)
+        self.PrograssBar.place(x=300, y=250, width=450, height=40)
+
+    def preview_mesh(self):
+        print("to do")
+        pass
+
+    def set_mesh_ref(self):
+        global h0
+        h0 = float(self.h0Entry.get())
+        self.StartConv["state"] = "normal"
+        if h0 != "":
+            self.MeshPreview["state"] = "normal"
 
     def openfile(self):
         global loadpath
@@ -108,7 +150,8 @@ class SelectingArea:
         os.mkdir(self.SaveFolderName.get())
         savepath = str(self.SaveFolderName.get()) + "/"
         print("savepath:", savepath)
-        self.StartConv["state"] = "normal"
+
+        self.SetMeshRef["state"] = "normal"
 
     def start_conv(self):
         print(loadpath)
@@ -118,7 +161,7 @@ class SelectingArea:
 
         for N in range(len(dataframe)):
 
-            mesh, anomaly = generate_groundtruth(dataframe, N)
+            mesh, anomaly = generate_groundtruth(dataframe, N, h0=h0)
             complex_mat = extract_el_potentials(
                 dataframe, N, delete_meas_electrodes=False
             )
@@ -193,5 +236,5 @@ sa = SelectingArea(app)
 
 
 app.config(menu=dropdown)
-app.geometry("770x250")
+app.geometry("770x310")
 app.mainloop()
