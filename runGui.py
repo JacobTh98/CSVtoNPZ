@@ -221,7 +221,7 @@ class SelectingArea:
         dataframe = pd.read_csv(loadpath)
         print("length of dataframe:", len(dataframe))
         progress_bar_step = 100 / len(dataframe)
-
+        print("Entrys inside dataframe:",len(dataframe))
         for N in tqdm(range(len(dataframe))):
 
             mesh, anomaly = generate_groundtruth(dataframe, N, h0=h0)
